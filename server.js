@@ -39,9 +39,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization','Accept','X-Requested-With']
 }));
 
-// Allow preflight for all routes
-app.options('*', cors());
-
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
