@@ -5,8 +5,8 @@ const connectDB = require('./config/db');
 
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-const authRoutes = require('./routes/authRoutes');
-const profileRoutes = require('./routes/profileRoutes');
+// const authRoutes = require('./routes/authRoutes'); // REMOVED
+// const profileRoutes = require('./routes/profileRoutes'); // REMOVE if you want no profile API
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const reportingRoutes = require('./routes/reportingRoutes');
 const supportRoutes = require('./routes/supportRoutes');
@@ -23,10 +23,8 @@ const allowedOrigins = [
   'https://stockvault-frontend.vercel.app', // <-- your current Vercel domain
 ];
 
-// CORS setup with restricted origins
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (like curl or Postman)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
@@ -34,25 +32,24 @@ app.use(cors({
     }
     return callback(null, true);
   },
-  credentials: true, // allow cookies / credentials if you use them
+  credentials: true,
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization','Accept','X-Requested-With']
 }));
 
-// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Logging middleware for easier debugging
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.originalUrl} from origin: ${req.headers.origin || 'unknown'}`);
   next();
 });
 
-// Register routes
+// Register feature routes ONLY (login/auth/profile removed)
+// app.use('/api/auth', authRoutes); // REMOVED
+// app.use('/api/profile', profileRoutes); // REMOVE if you want no profile API
+
 app.use('/api/products', productsRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/orders', orderRoutes);
@@ -60,13 +57,10 @@ app.use('/api/reporting', reportingRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/support', supportRoutes);
 
-// Root route
 app.get('/', (req, res) => {
   res.send('Inventory Management API');
 });
 
-// Error logging middleware (debug only) - logs stack and returns JSON
-// Remove or tighten this before long-term production use
 function logErrors(err, req, res, next) {
   console.error('ERROR STACK:', err.stack || err);
   next(err);
@@ -75,7 +69,6 @@ function logErrors(err, req, res, next) {
 function errorHandler(err, req, res, next) {
   res.status(err.status || 500).json({
     message: err.message || 'Internal Server Error',
-    // returning stack helps debugging on Render; remove in production
     stack: err.stack ? err.stack.split('\n') : []
   });
 }
