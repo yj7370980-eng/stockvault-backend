@@ -21,8 +21,6 @@ connectDB();
 // Allowed origins: include your real Vercel domain + any other frontends you use
 const allowedOrigins = [
   'https://stockvault-frontend-gzxshsv9d-yashs-projects-e2af8b99.vercel.app', // <-- your current Vercel domain
-  'https://stockvault-frontend-pp9tehcb5-yashs-projects-e2af8b99.vercel.app', // keep if used
-  'http://localhost:3000'
 ];
 
 // CORS setup with restricted origins
