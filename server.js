@@ -18,13 +18,34 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-const allowedOrigins = ['stockvault-frontend-pp9tehcb5-yashs-projects-e2af8b99.vercel.app'];
+const allowedOrigins = [
+  'https://stockvault-frontend-pp9tehcb5-yashs-projects-e2af8b99.vercel.app',
+  'http://localhost:3000',
+];
 
-app.use(cors());
+// CORS setup with restricted origins
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like curl or Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 
+// Body parser
 app.use(express.json());
 
-// Routes with protection where needed
+// Logging middleware for easier debugging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl} from origin: ${req.headers.origin || 'unknown'}`);
+  next();
+});
+
+// Register routes
 app.use('/api/products', productsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
@@ -34,6 +55,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reporting', reportingRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/support', supportRoutes);
+
+// Root route
 app.get('/', (req, res) => {
   res.send('Inventory Management API');
 });
