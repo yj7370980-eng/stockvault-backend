@@ -18,7 +18,7 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-const allowedOrigins = ['http://localhost:3000'];
+const allowedOrigins = ['stockvault-frontend-pp9tehcb5-yashs-projects-e2af8b99.vercel.app'];
 
 app.use(cors());
 
