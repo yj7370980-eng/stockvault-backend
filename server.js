@@ -5,49 +5,38 @@ const connectDB = require('./config/db');
 
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
-const profileRoutes = require('./routes/profileRoutes'); // Add this import
-const { protect } = require('./middleware/authMiddleware');
+const profileRoutes = require('./routes/profileRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
+const reportingRoutes = require('./routes/reportingRoutes');
+const supportRoutes = require('./routes/supportRoutes');
+const storeRoutes = require('./routes/storeRoutes');
+const productsRoutes = require('./routes/productsRoutes');
 
 const app = express();
 
 // Connect to MongoDB
 connectDB();
 
-// Middleware
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-  })
-);
+const allowedOrigins = ['http://localhost:3000'];
+
+app.use(cors());
 
 app.use(express.json());
 
-// Auth routes (register, login)
+// Routes with protection where needed
+app.use('/api/products', productsRoutes);
 app.use('/api/auth', authRoutes);
-
-// Profile routes protected by JWT auth middleware
-app.use('/api/profile', protect, profileRoutes); // Add this line
-
-app.use('/api/dashboard', protect, dashboardRoutes);
-
-app.use('/api/inventory', protect, inventoryRoutes);
-
-app.use('/api/orders', protect, orderRoutes);
-
-// Protect product routes with JWT auth middleware
-app.use('/api/products', protect, productRoutes);
-
-// Root route
+app.use('/api/profile', profileRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/reporting', reportingRoutes);
+app.use('/api/stores', storeRoutes);
+app.use('/api/support', supportRoutes);
 app.get('/', (req, res) => {
   res.send('Inventory Management API');
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

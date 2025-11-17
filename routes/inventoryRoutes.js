@@ -3,8 +3,8 @@ const router = express.Router();
 const { addInventory, removeInventory, getInventoryLogs } = require('../controllers/inventoryController');
 const { protect } = require('../middleware/authMiddleware');
 
-router.post('/add', protect, addInventory);
-router.post('/remove', protect, removeInventory);
-router.get('/logs', protect, getInventoryLogs);
+router.post('/add', addInventory);
+router.post('/remove', removeInventory);
+router.get('/logs', getInventoryLogs);
 
 module.exports = router;

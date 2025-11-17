@@ -51,7 +51,6 @@ const removeInventory = async (req, res) => {
   }
 };
 
-// Optional: View inventory logs
 const getInventoryLogs = async (req, res) => {
   try {
     const logs = await InventoryLog.find().populate('product');

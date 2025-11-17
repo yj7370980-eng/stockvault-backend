@@ -1,39 +1,29 @@
 const Order = require('../models/Order');
-const Product = require('../models/Product');
 
 const createOrder = async (req, res) => {
+  console.log("Received order creation request payload:", JSON.stringify(req.body, null, 2));
   try {
-    const { products } = req.body;
-
-    // Calculate total price
-    let totalPrice = 0;
-    for (const item of products) {
-      const product = await Product.findById(item.product);
-      if (!product) return res.status(404).json({ message: `Product ${item.product} not found` });
-      totalPrice += product.price * item.quantity;
-    }
-
-    const order = new Order({
-      user: req.user._id,
-      products,
-      totalPrice,
-    });
-
+    const order = new Order(req.body);
     await order.save();
-
     res.status(201).json(order);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error saving order:", JSON.stringify(error, null, 2));
+    res.status(400).json({ message: error.message, errors: error.errors || error });
   }
 };
 
 const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id }).populate('products.product');
-    res.json(orders);
+    const orders = await Order.find()
+      .populate('user')
+      .populate('orderItems.product');
+    res.json({ totalCount: orders.length, orders });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { createOrder, getOrders };
+module.exports = {
+  createOrder,
+  getOrders,
+};
